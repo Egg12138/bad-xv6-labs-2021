@@ -360,6 +360,7 @@ sfence_vma()
 // MAXVA is actually one bit less than the max allowed by
 // Sv39, to avoid having to sign-extend virtual addresses
 // that have the high bit set.
+// Sv39: 9bits 1stlevel, 9bits 2nd level, 9bits 3rdlevel, 12bits offset
 #define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
 
 typedef uint64 pte_t;

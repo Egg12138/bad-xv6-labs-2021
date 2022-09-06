@@ -1,0 +1,20 @@
+{
+	"makefile.extensionOutputFolder": "./.vscode",
+	"editor.quickSuggestions": {
+		"other": "on",
+		"comments": "off",
+		"strings": "off",
+	},
+	"git.timeline.showUncommitted": true,
+	"editor.suggestOnTriggerCharacters": true,
+	"editor.linkedEditing": true,
+	"editor.find.seedSearchStringFromSelection": "always",
+	"files.associations": {
+		"syscall.h": "c",
+		"types.h": "c",
+		"user.h": "c",
+		"stat.h": "c",
+		"memlayout.h": "c"
+	},
+	"C_Cpp.errorSquiggles": "Disabled",
+}

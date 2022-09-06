@@ -1,0 +1,27 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+
+		{
+			"name": "xv6debugger",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/kernel/kernel",
+			"stopAtEntry": true,
+			"cwd": "${workspaceFolder}",
+			"miDebuggerServerAddress": "localhost:26000", 
+			"miDebuggerPath": "/usr/bin/gdb-multiarch",
+			"MIMode":"gdb",
+			"preLaunchTask": "xv6build",
+			"externalConsole": false,
+			"setupCommands": [
+				{
+					"description": "pretty printing",
+					"text":"-enable-pretty-printing",
+					"ignoreFailures": true,
+				},
+			],
+
+		}
+	]
+}

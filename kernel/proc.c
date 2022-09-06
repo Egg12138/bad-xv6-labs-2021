@@ -43,11 +43,11 @@ proc_mapstacks(pagetable_t kpgtbl) {
 }
 
 // initialize the proc table at boot time.
+// !learn [procinit] proc init steps.
 void
 procinit(void)
 {
   struct proc *p;
-  
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
@@ -126,7 +126,13 @@ found:
     release(&p->lock);
     return 0;
   }
-
+  if((p->usyscall = (struct usyscall *)kalloc()) == 0) {
+    freeproc(p);
+    release(&p->lock);
+    return 0;
+  }
+  p->usyscall->pid = p->pid;
+  // Allocate usyscall after trapframe
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -134,6 +140,8 @@ found:
     release(&p->lock);
     return 0;
   }
+// TODO: [allocproc]don't forget to allocate and initialize the page in this function allocate usyscall page
+
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
@@ -153,9 +161,16 @@ freeproc(struct proc *p)
   if(p->trapframe)
     kfree((void*)p->trapframe);
   p->trapframe = 0;
+
+// TODO [freeproc]make sure to free the page
+  if(p->usyscall)
+    kfree((void *)p->usyscall);
+  p->usyscall = 0;
+
   if(p->pagetable)
     proc_freepagetable(p->pagetable, p->sz);
   p->pagetable = 0;
+
   p->sz = 0;
   p->pid = 0;
   p->parent = 0;
@@ -167,13 +182,14 @@ freeproc(struct proc *p)
 }
 
 // Create a user page table for a given process,
-// with no user memory, but with trampoline pages.
+// with *no user memory*, but with trampoline pages.
+// learn:[proc_pagetable] kernel mode and user mode
 pagetable_t
 proc_pagetable(struct proc *p)
 {
   pagetable_t pagetable;
 
-  // An empty page table.
+  // An empty [user] page table.
   pagetable = uvmcreate();
   if(pagetable == 0)
     return 0;
@@ -195,6 +211,15 @@ proc_pagetable(struct proc *p)
     uvmfree(pagetable, 0);
     return 0;
   }
+// TODO:[proc_pagetable] add functions
+  if(mappages(pagetable, USYSCALL, PGSIZE,
+              (uint64)(p->usyscall),
+              PTE_R | PTE_U) < 0) { // read-only.
+      uvmunmap(pagetable, USYSCALL, 1, 0);
+      uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+      uvmfree(pagetable, 0);
+      return 0;
+              }
 
   return pagetable;
 }
@@ -206,6 +231,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  uvmunmap(pagetable, USYSCALL, 1, 0);
   uvmfree(pagetable, sz);
 }
 
