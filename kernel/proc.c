@@ -140,8 +140,6 @@ found:
     release(&p->lock);
     return 0;
   }
-// TODO: [allocproc]don't forget to allocate and initialize the page in this function allocate usyscall page
-
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
@@ -162,7 +160,6 @@ freeproc(struct proc *p)
     kfree((void*)p->trapframe);
   p->trapframe = 0;
 
-// TODO [freeproc]make sure to free the page
   if(p->usyscall)
     kfree((void *)p->usyscall);
   p->usyscall = 0;
@@ -183,7 +180,6 @@ freeproc(struct proc *p)
 
 // Create a user page table for a given process,
 // with *no user memory*, but with trampoline pages.
-// learn:[proc_pagetable] kernel mode and user mode
 pagetable_t
 proc_pagetable(struct proc *p)
 {
@@ -211,7 +207,6 @@ proc_pagetable(struct proc *p)
     uvmfree(pagetable, 0);
     return 0;
   }
-// TODO:[proc_pagetable] add functions
   if(mappages(pagetable, USYSCALL, PGSIZE,
               (uint64)(p->usyscall),
               PTE_R | PTE_U) < 0) { // read-only.

@@ -17,7 +17,6 @@ sys_exit(void)
   return 0;  // not reached
 }
 
-// TODO: [sys_getpid]optimize 
 uint64
 sys_getpid(void)
 {
@@ -76,13 +75,17 @@ sys_sleep(void)
   return 0;
 }
 
-
+/// @param: char*, int, unsigned int*
+/// @brief  detecting which pages have bee accessed.
 #ifdef LAB_PGTBL
-// ToBeImpl:  [sys_pgaccess] finish it
-int
+uint64
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  // ToBeImpl: Fix this function .....
+  // using p->trampframe->aX to get args.
+  // using argstr,argaddr, argraw..., etc.
+  //struct proc *p = myproc();
   return 0;
 }
 #endif

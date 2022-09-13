@@ -24,6 +24,7 @@ main(void)
   dup(0);  // stderr
 
   for(;;){
+    // IDEA: is this step needed to be modified?
     printf("init: starting sh\n");
     pid = fork();
     if(pid < 0){
