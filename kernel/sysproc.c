@@ -83,7 +83,8 @@ uint64
 sys_pgaccess(void)
 {
   // ToBeImpl: Implement this syscall .....
-  // lab pgtbl: your code here.
+  // lab pgtbl: your code here.:w
+
   // takes thress arguments: start va of 1st user page; 
   // using p->trampframe->aX to get args.
   // using argstr,argaddr, argraw..., etc.
@@ -91,7 +92,8 @@ sys_pgaccess(void)
   uint64 base_va;                            // arg0: to store arg0 
   int pgnum;                               // arg1: to store num of pages 2b check
   uint64 mask;                             // arg2: to takes a user address to a buffer to store the results into the bitmask 
-  
+  :w
+
   char buffer[CHCKLIM];  // ont bit, ont status.
   if (((argaddr(0, &base_va)) < 0) ||  argint(1, &pgnum) || argaddr(2, &mask) )
     return -1;
@@ -101,7 +103,7 @@ sys_pgaccess(void)
 
     pte_t pte = base_va[pte_idx];
     if ((pte & PTE_V) && (pte & PTE_A)  == 0) {
-        
+
     }
 
   }
