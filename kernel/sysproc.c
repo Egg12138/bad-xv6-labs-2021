@@ -75,17 +75,37 @@ sys_sleep(void)
   return 0;
 }
 
-/// @param: char*, int, unsigned int*
-/// @brief  detecting which pages have bee accessed.
+/// @param: uint64(addr), int(number), uint64(addr)
+/// @brief:  detecting and reporting which pages have bee accessed.
+/// @note: by inspecting the access bits in the RISC-V pagetable . Hardware page walker marks these bits in the PTE. (dont worry about the TLB miss) 
 #ifdef LAB_PGTBL
 uint64
 sys_pgaccess(void)
 {
+  // ToBeImpl: Implement this syscall .....
   // lab pgtbl: your code here.
-  // ToBeImpl: Fix this function .....
+  // takes thress arguments: start va of 1st user page; 
   // using p->trampframe->aX to get args.
   // using argstr,argaddr, argraw..., etc.
-  //struct proc *p = myproc();
+  // struct proc *p = myproc();
+  uint64 base_va;                            // arg0: to store arg0 
+  int pgnum;                               // arg1: to store num of pages 2b check
+  uint64 mask;                             // arg2: to takes a user address to a buffer to store the results into the bitmask 
+  
+  char buffer[CHCKLIM];  // ont bit, ont status.
+  if (((argaddr(0, &base_va)) < 0) ||  argint(1, &pgnum) || argaddr(2, &mask) )
+    return -1;
+  // TODO: Find PTEs. using `vm::walk` 
+
+  for (int pte_idx = 0; pte_idx < PTENUM; pte_idx++){
+
+    pte_t pte = base_va[pte_idx];
+    if ((pte & PTE_V) && (pte & PTE_A)  == 0) {
+        
+    }
+
+  }
+
   return 0;
 }
 #endif

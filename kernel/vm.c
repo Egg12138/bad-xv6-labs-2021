@@ -77,11 +77,12 @@ void kvminithart()
 //    0..11 -- 12 bits of byte offset within the page.
 // learn: [walk]: usage and impl
 pte_t *
-walk(pagetable_t pagetable, uint64 va, int alloc)
+walk(pagetable_t pagetable, uint64 va, int alloc_needed)
 {
   if (va >= MAXVA)
-    panic("walk");
+    panic("walk: va is overflow");
 
+  // level: 0, 1, 2, 3. drop!
   for (int level = 2; level > 0; level--)
   {
     pte_t *pte = &pagetable[PX(level, va)];
@@ -91,7 +92,7 @@ walk(pagetable_t pagetable, uint64 va, int alloc)
     }
     else
     {
-      if (!alloc || (pagetable = (pde_t *)kalloc()) == 0)
+      if (!alloc_needed || (pagetable = (pde_t *)kalloc()) == 0)
         return 0;
       memset(pagetable, 0, PGSIZE);
       *pte = PA2PTE(pagetable) | PTE_V;

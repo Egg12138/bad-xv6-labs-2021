@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"git.timeline.showUncommitted": true,
+		"files.associations": {
+			"syscall.h": "c",
+			"types.h": "c",
+			"user.h": "c",
+			"stat.h": "c",
+			"memlayout.h": "c",
+			"riscv.h": "c"
+		}
+	}
+}

@@ -4,6 +4,7 @@
 
 char buf[512];
 
+
 void
 cat(int fd)
 {
