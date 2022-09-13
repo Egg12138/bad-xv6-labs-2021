@@ -1,0 +1,156 @@
+Binary file ./fs.img matches
+./grade-lab-pgtbl:@test(10, "pgtbltest: pgaccess", parent=test_pgtbltest)
+./grade-lab-pgtbl:    r.match('^pgaccess_test: OK$')
+Binary file ./kernel/kernel matches
+./kernel/kernel.asm:0000000080002210 <sys_pgaccess>:
+./kernel/kernel.asm:// ToBeImpl:  [sys_pgaccess] finish it
+./kernel/kernel.asm:sys_pgaccess(void)
+./kernel/kernel.sym:0000000080002210 sys_pgaccess
+./kernel/syscall.c:extern uint64 sys_pgaccess(void);
+./kernel/syscall.c:[SYS_pgaccess] sys_pgaccess,
+./kernel/syscall.h:#define SYS_pgaccess  30
+Binary file ./kernel/syscall.o matches
+./kernel/sysproc.c:sys_pgaccess(void)
+Binary file ./kernel/sysproc.o matches
+./user/cat.asm:0000000000000452 <pgaccess>:
+./user/cat.asm:.global pgaccess
+./user/cat.asm:pgaccess:
+./user/cat.asm: li a7, SYS_pgaccess
+./user/cat.sym:0000000000000452 pgaccess
+./user/echo.asm:00000000000003b8 <pgaccess>:
+./user/echo.asm:.global pgaccess
+./user/echo.asm:pgaccess:
+./user/echo.asm: li a7, SYS_pgaccess
+./user/echo.sym:00000000000003b8 pgaccess
+./user/forktest.asm:  3e:	42650513          	addi	a0,a0,1062 # 460 <pgaccess+0xe>
+./user/forktest.asm:  68:	40c50513          	addi	a0,a0,1036 # 470 <pgaccess+0x1e>
+./user/forktest.asm:  b8:	40c50513          	addi	a0,a0,1036 # 4c0 <pgaccess+0x6e>
+./user/forktest.asm:  d4:	3c050513          	addi	a0,a0,960 # 490 <pgaccess+0x3e>
+./user/forktest.asm:  ee:	3be50513          	addi	a0,a0,958 # 4a8 <pgaccess+0x56>
+./user/forktest.asm:0000000000000452 <pgaccess>:
+./user/forktest.asm:.global pgaccess
+./user/forktest.asm:pgaccess:
+./user/forktest.asm: li a7, SYS_pgaccess
+./user/grep.asm:00000000000005e2 <pgaccess>:
+./user/grep.asm:.global pgaccess
+./user/grep.asm:pgaccess:
+./user/grep.asm: li a7, SYS_pgaccess
+./user/grep.sym:00000000000005e2 pgaccess
+./user/grind.asm:0000000000000f24 <pgaccess>:
+./user/grind.asm:.global pgaccess
+./user/grind.asm:pgaccess:
+./user/grind.asm: li a7, SYS_pgaccess
+./user/grind.sym:0000000000000f24 pgaccess
+./user/init.asm:000000000000042c <pgaccess>:
+./user/init.asm:.global pgaccess
+./user/init.asm:pgaccess:
+./user/init.asm: li a7, SYS_pgaccess
+./user/init.sym:000000000000042c pgaccess
+./user/kill.asm:0000000000000398 <pgaccess>:
+./user/kill.asm:.global pgaccess
+./user/kill.asm:pgaccess:
+./user/kill.asm: li a7, SYS_pgaccess
+./user/kill.sym:0000000000000398 pgaccess
+./user/ln.asm:0000000000000394 <pgaccess>:
+./user/ln.asm:.global pgaccess
+./user/ln.asm:pgaccess:
+./user/ln.asm: li a7, SYS_pgaccess
+./user/ln.sym:0000000000000394 pgaccess
+./user/ls.asm:0000000000000608 <pgaccess>:
+./user/ls.asm:.global pgaccess
+./user/ls.asm:pgaccess:
+./user/ls.asm: li a7, SYS_pgaccess
+./user/ls.sym:0000000000000608 pgaccess
+./user/mkdir.asm:00000000000003ac <pgaccess>:
+./user/mkdir.asm:.global pgaccess
+./user/mkdir.asm:pgaccess:
+./user/mkdir.asm: li a7, SYS_pgaccess
+./user/mkdir.sym:00000000000003ac pgaccess
+./user/pgtbltest.asm:00000000000000e4 <pgaccess_test>:
+./user/pgtbltest.asm:pgaccess_test()
+./user/pgtbltest.asm:  printf("pgaccess_test starting\n");
+./user/pgtbltest.asm:  testname = "pgaccess_test";
+./user/pgtbltest.asm:  if (pgaccess(buf, 32, &abits) < 0)
+./user/pgtbltest.asm: 128:	414080e7          	jalr	1044(ra) # 538 <pgaccess>
+./user/pgtbltest.asm: 12c:	06054b63          	bltz	a0,1a2 <pgaccess_test+0xbe>
+./user/pgtbltest.asm:    err("pgaccess failed");
+./user/pgtbltest.asm:  if (pgaccess(buf, 32, &abits) < 0)
+./user/pgtbltest.asm: 168:	3d4080e7          	jalr	980(ra) # 538 <pgaccess>
+./user/pgtbltest.asm: 16c:	04054363          	bltz	a0,1b2 <pgaccess_test+0xce>
+./user/pgtbltest.asm:    err("pgaccess failed");
+./user/pgtbltest.asm: 17a:	04f71463          	bne	a4,a5,1c2 <pgaccess_test+0xde>
+./user/pgtbltest.asm:  printf("pgaccess_test: OK\n");
+./user/pgtbltest.asm:    err("pgaccess failed");
+./user/pgtbltest.asm:    err("pgaccess failed");
+./user/pgtbltest.asm:  pgaccess_test();
+./user/pgtbltest.asm: 1e6:	f02080e7          	jalr	-254(ra) # e4 <pgaccess_test>
+./user/pgtbltest.asm:0000000000000538 <pgaccess>:
+./user/pgtbltest.asm:.global pgaccess
+./user/pgtbltest.asm:pgaccess:
+./user/pgtbltest.asm: li a7, SYS_pgaccess
+./user/pgtbltest.c:void pgaccess_test();
+./user/pgtbltest.c:  pgaccess_test();
+./user/pgtbltest.c:pgaccess_test()
+./user/pgtbltest.c:  printf("pgaccess_test starting\n");
+./user/pgtbltest.c:  testname = "pgaccess_test";
+./user/pgtbltest.c:  if (pgaccess(buf, 32, &abits) < 0)
+./user/pgtbltest.c:    err("pgaccess failed");
+./user/pgtbltest.c:  if (pgaccess(buf, 32, &abits) < 0)
+./user/pgtbltest.c:    err("pgaccess failed");
+./user/pgtbltest.c:  printf("pgaccess_test: OK\n");
+Binary file ./user/pgtbltest.o matches
+./user/pgtbltest.sym:00000000000000e4 pgaccess_test
+./user/pgtbltest.sym:0000000000000538 pgaccess
+./user/rm.asm:00000000000003ac <pgaccess>:
+./user/rm.asm:.global pgaccess
+./user/rm.asm:pgaccess:
+./user/rm.asm: li a7, SYS_pgaccess
+./user/rm.sym:00000000000003ac pgaccess
+./user/sh.asm:0000000000000e88 <pgaccess>:
+./user/sh.asm:.global pgaccess
+./user/sh.asm:pgaccess:
+./user/sh.asm: li a7, SYS_pgaccess
+./user/sh.sym:0000000000000e88 pgaccess
+./user/stressfs.asm:0000000000000440 <pgaccess>:
+./user/stressfs.asm:.global pgaccess
+./user/stressfs.asm:pgaccess:
+./user/stressfs.asm: li a7, SYS_pgaccess
+./user/stressfs.sym:0000000000000440 pgaccess
+./user/user.h:int pgaccess(void *base, int len, void *mask);
+./user/usertests.asm:0000000000005910 <pgaccess>:
+./user/usertests.asm:.global pgaccess
+./user/usertests.asm:pgaccess:
+./user/usertests.asm: li a7, SYS_pgaccess
+./user/usertests.sym:0000000000005910 pgaccess
+Binary file ./user/usys.o matches
+./user/usys.pl:entry("pgaccess");
+./user/usys.S:.global pgaccess
+./user/usys.S:pgaccess:
+./user/usys.S: li a7, SYS_pgaccess
+./user/wc.asm:00000000000004ca <pgaccess>:
+./user/wc.asm:.global pgaccess
+./user/wc.asm:pgaccess:
+./user/wc.asm: li a7, SYS_pgaccess
+./user/wc.sym:00000000000004ca pgaccess
+./user/zombie.asm:000000000000035e <pgaccess>:
+./user/zombie.asm:.global pgaccess
+./user/zombie.asm:pgaccess:
+./user/zombie.asm: li a7, SYS_pgaccess
+./user/zombie.sym:000000000000035e pgaccess
+Binary file ./user/_cat matches
+Binary file ./user/_echo matches
+Binary file ./user/_forktest matches
+Binary file ./user/_grep matches
+Binary file ./user/_grind matches
+Binary file ./user/_init matches
+Binary file ./user/_kill matches
+Binary file ./user/_ln matches
+Binary file ./user/_ls matches
+Binary file ./user/_mkdir matches
+Binary file ./user/_pgtbltest matches
+Binary file ./user/_rm matches
+Binary file ./user/_sh matches
+Binary file ./user/_stressfs matches
+Binary file ./user/_usertests matches
+Binary file ./user/_wc matches
+Binary file ./user/_zombie matches
