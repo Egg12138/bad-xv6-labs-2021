@@ -675,3 +675,28 @@ procdump(void)
     printf("\n");
   }
 }
+
+uint64
+pgaccess(void * pg, int pgnum, void * mask)
+{
+
+  struct  proc *p = myproc();
+  if (p == 0) {
+    return 1;
+  }
+
+  pagetable_t pagetable = p->pagetable;
+  int new_mask;  
+  for (int pgidx = 0; pgidx < pgnum; pgidx++) {
+    pte_t *pte;
+    pte = walk(pagetable, ((uint64)pg + (uint64)PGSIZE * pgidx), 0); // not alloc
+    if (pte != 0 && ((*pte) & PTE_A)) {
+      new_mask |= 1 << pgidx;
+      *pte ^= PTE_A;
+    }
+  }
+
+  return (uint64)copyout(pagetable, (uint64)mask, (char *)&new_mask, sizeof(int));
+
+
+}

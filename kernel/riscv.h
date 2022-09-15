@@ -368,6 +368,6 @@ typedef uint64 pte_t;
 typedef uint64 *pagetable_t; // 512 PTEs
 
 // TODO: add a macro which limits the number of pages canB check`
-#define CHCKLIM 5
+#define CHCKPGNUM 5
 #define PTENUM 1 << 9
 
