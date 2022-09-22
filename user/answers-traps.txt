@@ -8,4 +8,17 @@ A1:
 Q2: Where is the call to function f in the assembly code for main? 
 	Where is the call to g? 
 	(Hint: the compiler may inline functions.)
-A2: for main, calling to f is: f:40. calling to g is:
+A2: for main, calling to f is: f:40. calling to g is line 41.(they are inlined)
+
+Q3: At what address is the function `printf` located ?
+A3: origin file:44. `jalr 1536(ra)`<=>`jalr ra 1536(ra)` , 1536 + x[ra] = pc, pc + 4 = 1600 + x[ra] =>f[ra]
+	Here x[ra] = 48 = 0x30 => printf is located at 0x630
+
+Q4: What value is in the reg `ra` just after the `jalr` to `printf` in `main`?
+A4:
+	jalr 1536(ra: 0x30)  => 1536 + x[ra] + 4 => x[ra],
+	then goto 0x000000630 <printf>:
+	
+
+
+
