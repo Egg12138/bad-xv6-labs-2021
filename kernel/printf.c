@@ -132,3 +132,15 @@ printfinit(void)
   initlock(&pr.lock, "pr");
   pr.locking = 1;
 }
+
+int
+backtrace(void)
+{
+  // ToBeImpl: Implment this
+  // using `sys_sleep`  
+
+
+  return 0;
+
+
+}

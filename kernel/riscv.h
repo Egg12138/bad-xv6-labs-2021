@@ -323,6 +323,16 @@ r_ra()
   return x;
 }
 
+// read the frame pointer
+static inline uint64
+r_fp()
+{
+
+  uint64 x;
+  asm volatile("mv %0, s0" : "=r" (x));
+  return x;
+
+}
 // flush the TLB.
 static inline void
 sfence_vma()
@@ -364,3 +374,5 @@ sfence_vma()
 
 typedef uint64 pte_t;
 typedef uint64 *pagetable_t; // 512 PTEs
+
+

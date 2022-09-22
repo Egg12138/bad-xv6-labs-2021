@@ -52,6 +52,7 @@ sys_sbrk(void)
   return addr;
 }
 
+// TODO: Insert a call to kernel::printf::backtrace.
 uint64
 sys_sleep(void)
 {
@@ -69,6 +70,7 @@ sys_sleep(void)
     }
     sleep(&ticks, &tickslock);
   }
+  backtrace();
   release(&tickslock);
   return 0;
 }
