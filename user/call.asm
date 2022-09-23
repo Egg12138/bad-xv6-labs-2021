@@ -10,29 +10,21 @@ Disassembly of section .text:
 #include "kernel/stat.h"
 #include "user/user.h"
 
-# g(x) = x + 3
-# f(x) = g(x)
 int g(int x) {
-   0:	1141                	addi	sp,sp,-16   # Stack Pointer -= 16.栈向下，所以是栈生长
-   # offset = 8, of sp. 即将占底指针s0/fp处的8字节的内容存放到栈顶sp+8bytes的位置
-   2:	e422                	sd	s0,8(sp)       # Store Double := sd rs2, offset(rs1). 将x[rs2]的8 bytes存入x[rs1]+offset处
-   # s0 = sp + 16
-   4:	0800                	addi	s0,sp,16    
+   0:	1141                	addi	sp,sp,-16
+   2:	e422                	sd	s0,8(sp)
+   4:	0800                	addi	s0,sp,16
   return x+3;
 }
-   # 6: 250d <=> 0b10010100001101
-   # manual: addiw [11:0], rs1:19-15, 000, rd:11-7, 0011011 
-   6:	250d                	addiw	a0,a0,3     # 返回值！符号位扩展的立即数3加到a0并将结果替换原来的a0，且截断为32bit，忽略溢出
-   8:	6422                	ld	s0,8(sp)       # Load Double := sp + 8bytes开始读8bytes(2words)写到s0里。
-   a:	0141                	addi	sp,sp,16    # 
+   6:	250d                	addiw	a0,a0,3
+   8:	6422                	ld	s0,8(sp)
+   a:	0141                	addi	sp,sp,16
    c:	8082                	ret
 
-
-# g 和 f 内联
 000000000000000e <f>:
 
 int f(int x) {
-   e:	1141                	addi	sp,sp,-16    
+   e:	1141                	addi	sp,sp,-16
   10:	e422                	sd	s0,8(sp)
   12:	0800                	addi	s0,sp,16
   return g(x);
@@ -44,39 +36,18 @@ int f(int x) {
 
 000000000000001c <main>:
 
-void reimplmain(void) {
-
-
-}
 void main(void) {
-
-#void main(void) {
-#  printf("%d %d\n", f(8)+1, 13);
-#  exit(0);
-#}
-
-  # 开辟16字节栈空间
   1c:	1141                	addi	sp,sp,-16
-  # ra := Return Address 在调用中不保留, 将ra的8字节存到sp+8处
   1e:	e406                	sd	ra,8(sp)
-  # save 0 of sp,也就是保存当前的的栈帧指针sp/fp内容到从栈顶sp开始的前2字(16)的空间里去。
   20:	e022                	sd	s0,0(sp)
-  # 前面一个已经存完，新的栈帧（也就是下一刻的当前帧）在上一个栈帧末尾开始，也就是原始sp开始。继续2字节
-  22:	0800                	addi	s0,sp,16 #16 = 2w.
-  
-  
-  # LEARN: LEARN the jmp impl
-  # printf
+  22:	0800                	addi	s0,sp,16
   printf("%d %d\n", f(8)+1, 13);
-  # a2 - a7. purely as function args. a0-a1 . as function args / return values
-  24:	4635                	li	a2,13 # 存的是printf的参数13
-  26:	45b1                	li	a1,12 # 第一个参数,编译器已经展开为8+1+3=12了 
-  # a0 现在存储着 pc + 0x0 的结果。
-  28:	00000517          	auipc	a0,0x0 # Add Uper Immediate to PC.  
+  24:	4635                	li	a2,13
+  26:	45b1                	li	a1,12
+  28:	00000517          	auipc	a0,0x0
   2c:	7b050513          	addi	a0,a0,1968 # 7d8 <malloc+0xea>
   30:	00000097          	auipc	ra,0x0
-  # actually, jalr 1536(ra) <=> jalr ra 1536(ra)
-  34:	600080e7          	jalr	1536(ra) # 0x630 <printf> jmp to printf
+  34:	600080e7          	jalr	1536(ra) # 630 <printf>
   exit(0);
   38:	4501                	li	a0,0
   3a:	00000097          	auipc	ra,0x0
@@ -1123,12 +1094,10 @@ fprintf(int fd, const char *fmt, ...)
 void
 printf(const char *fmt, ...)
 {
- # stack : (top)sp[          ]sp+96
- # TODO: dont forget me!
- 630:	711d                	addi	sp,sp,-96   # stack expand...
- 632:	ec06                	sd	ra,24(sp)      # *(24 + x[sp]) = x[ra] 
- 634:	e822                	sd	s0,16(sp)      # *(16 + x[sp]) = x[s0]  
- 636:	1000                	addi	s0,sp,32    # x[s0] = x[sp] + 0x20
+ 630:	711d                	addi	sp,sp,-96
+ 632:	ec06                	sd	ra,24(sp)
+ 634:	e822                	sd	s0,16(sp)
+ 636:	1000                	addi	s0,sp,32
  638:	e40c                	sd	a1,8(s0)
  63a:	e810                	sd	a2,16(s0)
  63c:	ec14                	sd	a3,24(s0)

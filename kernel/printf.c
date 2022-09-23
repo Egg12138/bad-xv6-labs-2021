@@ -122,6 +122,7 @@ panic(char *s)
   printf(s);
   printf("\n");
   panicked = 1; // freeze uart output from other CPUs
+  backtrace();
   for(;;)
     ;
 }
@@ -138,7 +139,19 @@ backtrace(void)
 {
   // ToBeImpl: Implment this
   // using `sys_sleep`  
+  // 注意，一开始的时候r_fp()返回的就是地址，
+  uint64 s0 = r_fp();
+  uint ra;
+  // PA(top) < PA(bottom)
+  uint64 pgtop = PGROUNDDOWN(s0);
+  uint64 pgbottom  = PGROUNDUP(s0);
 
+  while (s0 < pgbottom && s0 > pgtop) {
+    ra = *(uint64 *)(s0-8);
+    printf("0x%p\n", ra);
+    s0 = *(uint64 *)(s0-16);
+    
+  }
 
   return 0;
 
