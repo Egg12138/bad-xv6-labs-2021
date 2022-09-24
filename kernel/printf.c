@@ -140,11 +140,13 @@ backtrace(void)
   // ToBeImpl: Implment this
   // using `sys_sleep`  
   // 注意，一开始的时候r_fp()返回的就是地址，
-  uint64 s0 = r_fp();
-  uint ra;
+  uint64 s0 = r_fp();// 这里s0值是寄存器s0的内容
+  uint64 ra;
   // PA(top) < PA(bottom)
   uint64 pgtop = PGROUNDDOWN(s0);
   uint64 pgbottom  = PGROUNDUP(s0);
+
+  printf("page: %p -- %p\n", pgtop, pgbottom);
 
   while (s0 < pgbottom && s0 > pgtop) {
     ra = *(uint64 *)(s0-8);
@@ -152,7 +154,11 @@ backtrace(void)
     s0 = *(uint64 *)(s0-16);
     
   }
-
+  /*
+  myproc()->trapframe->a2 = 0x2; 
+  myproc()->trapframe->a1 = 0x1; 
+  */
+  printf("x==>%d y==>%d", 3);
   return 0;
 
 

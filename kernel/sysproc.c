@@ -97,3 +97,29 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// ToBeImpl: impl sys_sigalarm
+// when alarm is called(arg0: interval num, arg1: pointer to func), kernel will do func
+// func returns => app resume where it left off.(save context?)
+// learn: get what is the 'tick' of CPU in xv6.
+uint64
+sys_sigalarm(void)
+{
+
+
+
+
+  return 0;
+
+}
+
+
+// ToBeImpl: impl sys_sigreturn
+uint64
+sys_sigreturn(void)
+{
+
+
+
+  return 0;
+}
