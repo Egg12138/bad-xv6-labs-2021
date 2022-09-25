@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "trap.c"
 
 uint64
 sys_exit(void)
@@ -106,7 +107,17 @@ uint64
 sys_sigalarm(void)
 {
 
-
+  uint64 interval, fn;//fn = arg1, which is the pointer
+  uint prev_ticks = myproc()->;
+  if (argint(0, &interval) < 0 || argaddr(1, &fn) < 0) {
+    if (interval == 0 && fn == 0)
+      return 0;
+    if (ticks - prev_ticks == interval) {
+      fn();
+    } else {
+      panic("ticks is smaller than previous!");
+    } 
+  }
 
 
   return 0;

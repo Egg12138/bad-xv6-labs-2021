@@ -6,6 +6,8 @@
 #include "proc.h"
 #include "defs.h"
 
+
+//learn: learn how ticks' is called 
 struct spinlock tickslock;
 uint ticks;
 

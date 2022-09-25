@@ -105,4 +105,10 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+
+  /* 我总觉得不断给proc加字段不太合适 */
+
+  uint alarm_interval          // interval 
+  uint ticks;                  // current ticks.
+  uint64 alarmptr;             // as a pointer to the sigalarm handler
 };
