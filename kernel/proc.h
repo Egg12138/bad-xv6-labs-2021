@@ -111,4 +111,5 @@ struct proc {
   uint ticks;                  // current ticks.
   void (*alarmhandler)();             // as a pointer to the sigalarm handler
   struct trapframe *savedtrapframe;
+  int  alarmhandled;
 };

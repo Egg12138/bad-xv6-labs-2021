@@ -70,7 +70,7 @@ usertrap(void)
   } else if((which_dev = devintr()) != 0){
     // ok
 
-    if ((which_dev == 2) && p->alarmhandler == 0) {  //  intrrupt 
+    if ((which_dev == 2) && p->alarmhandled == 0) {  //  intrrupt 
       p->ticks += 1;
       if ((p->ticks == p->alarm_interval) && p->alarm_interval != 0) {
         printf("alarm!\n");    

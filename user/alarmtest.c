@@ -154,6 +154,6 @@ slow_handler()
   for (int i = 0; i < 1000*500000; i++) {
     asm volatile("nop"); // avoid compiler optimizing away loop
   }
-  sigalarm(0, 0);
+  //sigalarm(0, 0);
   sigreturn();
 }
