@@ -69,7 +69,56 @@ usertrap(void)
     syscall();
   } else if((which_dev = devintr()) != 0){
     // ok
-  } else {
+
+    if ((which_dev == 2) && p->alarmhandler == 0) {  //  intrrupt 
+      p->ticks += 1;
+      if ((p->ticks == p->alarm_interval) && p->alarm_interval != 0) {
+        printf("alarm!\n");    
+        p->ticks = 0;
+        p->savedtrapframe->epc = p->trapframe->epc;
+        p->savedtrapframe->ra = p->trapframe->ra;
+        p->savedtrapframe->sp = p->trapframe->sp;
+        p->savedtrapframe->gp = p->trapframe->gp;
+        p->savedtrapframe->tp = p->trapframe->tp;
+        p->savedtrapframe->t0 = p->trapframe->t0;
+        p->savedtrapframe->t1 = p->trapframe->t1;
+        p->savedtrapframe->t2 = p->trapframe->t2;
+        p->savedtrapframe->t3 = p->trapframe->t3;
+        p->savedtrapframe->t4 = p->trapframe->t4;
+        p->savedtrapframe->s0 = p->trapframe->s0;
+        p->savedtrapframe->s1 = p->trapframe->s1;
+        p->savedtrapframe->s2 = p->trapframe->s2;
+        p->savedtrapframe->s3 = p->trapframe->s3;
+        p->savedtrapframe->s4 = p->trapframe->s4;
+        p->savedtrapframe->s5 = p->trapframe->s5;
+        p->savedtrapframe->s6 = p->trapframe->s6;
+        p->savedtrapframe->s7 = p->trapframe->s7;
+        p->savedtrapframe->s8 = p->trapframe->s8;
+        p->savedtrapframe->s9 = p->trapframe->s9;
+        p->savedtrapframe->s10 = p->trapframe->s10;
+        p->savedtrapframe->s11 = p->trapframe->s11;
+        p->savedtrapframe->a0 = p->trapframe->a0;
+        p->savedtrapframe->a1 = p->trapframe->a1;
+        p->savedtrapframe->a2 = p->trapframe->a2;
+        p->savedtrapframe->a3 = p->trapframe->a3;
+        p->savedtrapframe->a4 = p->trapframe->a4;
+        p->savedtrapframe->a5 = p->trapframe->a5;
+        p->savedtrapframe->a6 = p->trapframe->a6;
+        p->savedtrapframe->a7 = p->trapframe->a7;
+
+        p->trapframe->epc = (uint64)p->alarmhandler;
+        p->ticks = 0;
+      }
+
+
+    }
+
+
+
+
+
+  }   
+  else {
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
     p->killed = 1;

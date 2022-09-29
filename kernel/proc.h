@@ -107,7 +107,8 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 
-  uint alarm_interval          // interval 
+  uint alarm_interval;          // interval 
   uint ticks;                  // current ticks.
-  uint64 alarmptr;             // as a pointer to the sigalarm handler
+  void (*alarmhandler)();             // as a pointer to the sigalarm handler
+  struct trapframe *savedtrapframe;
 };

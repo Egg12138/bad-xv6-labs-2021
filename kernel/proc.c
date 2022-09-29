@@ -119,14 +119,16 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
-
+  p->ticks = 0;
+  p->alarm_interval = 0;
   // Allocate a trapframe page.
-  if((p->trapframe = (struct trapframe *)kalloc()) == 0){
+  if(((p->trapframe = (struct trapframe *)kalloc()) == 0) || (p->savedtrapframe = (struct trapframe *)kalloc()) == 0){
+    // return 0 代表已经没有空闲了
     freeproc(p);
     release(&p->lock);
     return 0;
   }
-
+  
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
