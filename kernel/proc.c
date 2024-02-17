@@ -336,6 +336,15 @@ reparent(struct proc *p)
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait().
+//  > If p is init, xv6 panics
+//  > If Ok: close fds:
+//      >     直接遍历当前proc所**正在**管理的（最多NOFILE=16个）struct file, proc->ofiles
+//      >     每一个都执行 fileclose(struct file)
+//          > `fileclose`中，我们对每个file都检查:
+//          * ref < 0 肯定 panic
+//          * ref > 1 我们只用ref--
+//          * ref = 1 我们ref-- =0, 所以还需要回收资源:
+//              > file的类型: pipe，专用的调用， inode 或者 device 则需要跟fs交互
 void
 exit(int status)
 {
@@ -523,8 +532,11 @@ forkret(void)
   usertrapret();
 }
 
+//  [Process Sleeping ]
 // Atomically release lock and sleep on chan.
 // Reacquires lock when awakened.
+//  [Linux Manual]:  sleep()  causes  the calling thread to sleep either until the number of real-time seconds specified in seconds
+// have elapsed or until a signal arrives which is not ignored.
 void
 sleep(void *chan, struct spinlock *lk)
 {

@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "defs.h": "c",
+    "memlayout.h": "c",
+    "user.h": "c",
+    "types.h": "c",
+    "riscv.h": "c"
+  },
+  "C_Cpp.default.compilerPath": "/usr/bin/gcc-13"
+}
