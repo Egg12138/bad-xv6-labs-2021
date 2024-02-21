@@ -52,18 +52,25 @@ ls(char *path)
       break;
     }
     strcpy(buf, path);
+    // p: fmt name 使用，以及回溯使用，
     p = buf+strlen(buf);
     *p++ = '/';
+    // 不断地/read from fd to de
+    // read内部的lseek(file->off)在自增移动。
+    // every step is sizeof(de) width;
     while(read(fd, &de, sizeof(de)) == sizeof(de)){
       if(de.inum == 0)
         continue;
+      // move dir entry name to p
       memmove(p, de.name, DIRSIZ);
+      // 尾部安全
       p[DIRSIZ] = 0;
+      // get stat ,store to buf
       if(stat(buf, &st) < 0){
         printf("ls: cannot stat %s\n", buf);
         continue;
       }
-      printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+      printf("-> %s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
     }
     break;
   }

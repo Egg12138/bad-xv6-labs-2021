@@ -33,8 +33,8 @@ void prime_proc_handler(int l2c[2]) {
          close(l2c[PIPE_READ]);
          exit(1);
    } else if (pid > 0) { //child
-         close(c2r[READ]);
-         while(read_from(left[PIPE_READ], &number, sizeof(int))) {
+         close(c2r[PIPE_READ]);
+         while(read_from(l2c[PIPE_READ], &number, sizeof(int))) {
             if (number % prime == 0) continue;
             write_to(l2c[PIPE_WRITE], &number, sizeof(int));
          }
@@ -62,10 +62,10 @@ main(void)
    }
 
    if (pid > 0) {// children process.  
-      close(p[READ]);
+      close(p[PIPE_READ]);
       for (int dig = 2; dig < 36; dig++) 
-         write_to(p[WRITE], &dig, sizeof(int));
-      close(p[WRITE]);
+         write_to(p[PIPE_WRITE], &dig, sizeof(int));
+      close(p[PIPE_WRITE]);
       exit(0);
    } else {
       prime_proc_handler(p);

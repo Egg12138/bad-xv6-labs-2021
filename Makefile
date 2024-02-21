@@ -195,7 +195,8 @@ UPROGS=\
 	$U/_zombie\
 	$U/_sleep\
 	$U/_pingpong\
-	$U_primes\
+	$U/_find\
+	# $U/_primes\
 
 # 这样做是仅在 grade 测试时有 `$LAB`这个变量才有用，不合适，应该直接加到`UPROGs`里
 # ifeq ($(LAB),util)

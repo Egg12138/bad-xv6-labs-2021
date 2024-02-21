@@ -70,6 +70,10 @@ gets(char *buf, int max)
   return buf;
 }
 
+/// @brief open `n` and read the stat to `st`
+/// @param n filename
+/// @param st struct stat
+/// @return 
 int
 stat(const char *n, struct stat *st)
 {

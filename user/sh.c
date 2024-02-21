@@ -102,13 +102,16 @@ runcmd(struct cmd *cmd)
     if(pipe(p) < 0)
       panic("pipe");
     if(fork1() == 0){
+      // close stdout, output to piperight
       close(1);
+      // why dupilcate p[READ]?
       dup(p[1]);
       close(p[0]);
       close(p[1]);
       runcmd(pcmd->left);
     }
     if(fork1() == 0){
+      // close stdin, input from pipeleft
       close(0);
       dup(p[0]);
       close(p[0]);
