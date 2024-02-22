@@ -33,10 +33,10 @@ kinit()
 void
 freerange(void *pa_start, void *pa_end)
 {
-  char *p;
-  p = (char*)PGROUNDUP((uint64)pa_start);
-  for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
-    kfree(p);
+  char *pg;
+  pg = (char*)PGROUNDUP((uint64)pa_start);
+  for(; pg + PGSIZE <= (char*)pa_end; pg += PGSIZE)
+    kfree(pg);
 }
 
 // Free the page of physical memory pointed at by v,
@@ -71,12 +71,26 @@ kalloc(void)
   struct run *r;
 
   acquire(&kmem.lock);
-  r = kmem.freelist;
+  r = kmem.freelist; // entry address of the free list 
   if(r)
-    kmem.freelist = r->next;
+    kmem.freelist = r->next; // sequentially remove a low-address free list
   release(&kmem.lock);
 
   if(r)
-    memset((char*)r, 5, PGSIZE); // fill with junk
+    memset((char*)r, 5, PGSIZE); // fill with junk: (char) 5
   return (void*)r;
+}
+
+uint64
+free_bytes(void)
+{
+  struct run *r = kmem.freelist;
+  uint64 bytes = 0;
+  acquire(&kmem.lock); 
+  while (r) {
+    r = r->next;
+    bytes += PGSIZE;
+  }
+  release(&kmem.lock);
+  return bytes;
 }

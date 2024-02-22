@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -95,3 +96,52 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+
+uint64
+sys_trace(void)
+{
+  // first arg is the mask -> arg(0)    
+  // in case of mask = SYS_1 | SYS_2 ?
+  // if proc->trapframe->a7 == SYS_TRACE_ID
+  //  turn on 
+  int mask; 
+  if (argint(0, &mask) < 0)
+    return -1;
+  struct proc *p = myproc(); 
+  // set the trigger
+  p->trapframe->a6 = (1 << 22);
+  p->trace_mask = mask;
+  return   1;
+}
+
+/// @brief load freememory and proc_num && copy sysinfo to user space
+/// @param p(from_argaddr): struct sysinfo *p, (传入一个空的info进来)
+/// @return 
+uint64 
+sys_sysinfo(void)
+{
+  uint64 sinfo_va;  
+  struct sysinfo sinfo;
+  struct proc *p = myproc();
+  if (argaddr(0, &sinfo_va) < 0) 
+    return -1;
+  // load info to the empty sysinfo struct.
+  sinfo.freemem = free_bytes();
+  sinfo.nproc = proc_num();
+  // copyout
+  if (copyout(p->pagetable, sinfo_va, (char *)&sinfo, sizeof(sinfo)) < 0)
+    return -1;
+  return 0;
+}
+
+// static 
+// uint64
+// sysstat(struct proc *p, uint64 va)
+// {
+//   struct sysinfo si;
+//   if (copyout(p->pagetable, ..., (char *)va, sizeof(si) ))
+//   return 0;
+// }
+
+

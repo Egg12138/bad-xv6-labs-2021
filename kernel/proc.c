@@ -1,5 +1,5 @@
-#include "types.h"
 #include "param.h"
+#include "types.h"
 #include "memlayout.h"
 #include "riscv.h"
 #include "spinlock.h"
@@ -294,6 +294,9 @@ fork(void)
 
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
+
+  // trace:
+  np->trace_mask = p->trace_mask;
 
   // increment reference counts on open file descriptors.
   for(i = 0; i < NOFILE; i++)
@@ -653,4 +656,15 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+
+uint64
+proc_num(void)
+{
+  uint64 cnt = 0;  
+  struct proc *p;
+  for (p = proc; p < &proc[NPROC]; p++) 
+    if (p->state != UNUSED ) cnt++;
+  return cnt; 
 }

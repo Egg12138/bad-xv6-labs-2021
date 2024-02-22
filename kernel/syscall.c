@@ -6,6 +6,13 @@
 #include "proc.h"
 #include "syscall.h"
 #include "defs.h"
+#include "sysinfo.h"
+
+#define MASK_CONTAINS(p,id) \
+    ((((p)->trace_mask & (1 << (id))) >> id) != 0)   
+#define ENABLE_TRACE(p)  ((p)->trace_mask != 0)
+
+
 
 // Fetch the uint64 at addr from the current process.
 int
@@ -53,11 +60,11 @@ argraw(int n)
   return -1;
 }
 
-// Fetch the nth 32-bit system call argument.
+// Fetch the Nth 32-bit system call argument.
 int
-argint(int n, int *ip)
+argint(int N, int *ip)
 {
-  *ip = argraw(n);
+  *ip = argraw(N);
   return 0;
 }
 
@@ -104,6 +111,8 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
+extern uint64 sys_trace(void);
+extern uint64 sys_sysinfo(void);
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -127,6 +136,35 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_trace]   sys_trace, 
+[SYS_sysinfo] sys_sysinfo,
+};
+
+
+static const char *syscallnames[] = {
+[SYS_fork]    "sys_fork",
+[SYS_exit]    "sys_exit",
+[SYS_wait]    "sys_wait",
+[SYS_pipe]    "sys_pipe",
+[SYS_read]    "sys_read",
+[SYS_kill]    "sys_kill",
+[SYS_exec]    "sys_exec",
+[SYS_fstat]   "sys_fstat",
+[SYS_chdir]   "sys_chdir",
+[SYS_dup]     "sys_dup",
+[SYS_getpid]  "sys_getpid",
+[SYS_sbrk]    "sys_sbrk",
+[SYS_sleep]   "sys_sleep",
+[SYS_uptime]  "sys_uptime",
+[SYS_open]    "sys_open",
+[SYS_write]   "sys_write",
+[SYS_mknod]   "sys_mknod",
+[SYS_unlink]  "sys_unlink",
+[SYS_link]    "sys_link",
+[SYS_mkdir]   "sys_mkdir",
+[SYS_close]   "sys_close",
+[SYS_trace]   "sys_trace", 
+[SYS_sysinfo] "sys_sysinfo",
 };
 
 void
@@ -135,7 +173,10 @@ syscall(void)
   int num;
   struct proc *p = myproc();
 
-  num = p->trapframe->a7;
+  num = p->trapframe->a7; // syscall number
+
+  
+
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     p->trapframe->a0 = syscalls[num]();
   } else {
@@ -143,4 +184,13 @@ syscall(void)
             p->pid, p->name, num);
     p->trapframe->a0 = -1;
   }
+
+  // if trace turns on
+  
+  if ( ENABLE_TRACE(p) && 
+       MASK_CONTAINS(p, num)
+  ) 
+      printf("%d: syscall %s -> %d\n", 
+        p->pid, syscallnames[num], RET_PID(p));
+  
 }

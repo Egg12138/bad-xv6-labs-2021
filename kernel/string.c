@@ -1,5 +1,10 @@
 #include "types.h"
 
+/// @brief assign c to n elements of dst  
+/// @param dst 
+/// @param c 
+/// @param n 
+/// @return 
 void*
 memset(void *dst, int c, uint n)
 {
