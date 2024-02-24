@@ -343,6 +343,7 @@ sfence_vma()
 #define PTE_W (1L << 2)
 #define PTE_X (1L << 3)
 #define PTE_U (1L << 4) // 1 -> user can access
+#define PTE_A (1L << 6) // RV64 Sv39 PTE, access bit
 
 // shift a physical address to the right place for a PTE.
 #define PA2PTE(pa) ((((uint64)pa) >> 12) << 10)
@@ -354,6 +355,7 @@ sfence_vma()
 // extract the three 9-bit page table indices from a virtual address.
 #define PXMASK          0x1FF // 9 bits
 #define PXSHIFT(level)  (PGSHIFT+(9*(level)))
+/// 得到PTE的索引，va 右移，每高一级移需要多移9位，因为我们使用9bits/PTE宽, usage: pagetable[PX(...)]
 #define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
 
 // one beyond the highest possible virtual address.

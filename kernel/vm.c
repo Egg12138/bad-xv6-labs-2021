@@ -10,37 +10,38 @@
  * the kernel's page table.
  */
 pagetable_t kernel_pagetable;
-
+const char *splier = "..";
 extern char etext[];  // kernel.ld sets this to end of kernel code.
 
 extern char trampoline[]; // trampoline.S
 
-// Make a direct-map page table for the kernel.
+// Make a **direct-map**(using PA instead of VA) page table for the kernel.
 pagetable_t
 kvmmake(void)
 {
   pagetable_t kpgtbl;
 
+  /// 1. kvmmake alloc 一个 Physical Frame 来保存 根页表
   kpgtbl = (pagetable_t) kalloc();
   memset(kpgtbl, 0, PGSIZE);
 
-  // uart registers
+  // uart registers   内核区直接映射, VA=PA
   kvmmap(kpgtbl, UART0, UART0, PGSIZE, PTE_R | PTE_W);
 
-  // virtio mmio disk interface
+  // virtio mmio disk interface  内核区直接映射, VA=PA
   kvmmap(kpgtbl, VIRTIO0, VIRTIO0, PGSIZE, PTE_R | PTE_W);
 
-  // PLIC
+  // PLIC  内核区直接映射, VA=PA
   kvmmap(kpgtbl, PLIC, PLIC, 0x400000, PTE_R | PTE_W);
 
-  // map kernel text executable and read-only.
+  // map kernel text executable and read-only. 内核区直接映射, VA=PA
   kvmmap(kpgtbl, KERNBASE, KERNBASE, (uint64)etext-KERNBASE, PTE_R | PTE_X);
 
-  // map kernel data and the physical RAM we'll make use of.
+  // map kernel data and the physical RAM we'll make use of. 内核区直接映射, VA=PA
   kvmmap(kpgtbl, (uint64)etext, (uint64)etext, PHYSTOP-(uint64)etext, PTE_R | PTE_W);
 
   // map the trampoline for trap entry/exit to
-  // the highest virtual address in the kernel.
+  // the highest virtual address in the kernel. trampoline 并不是直接映射了
   kvmmap(kpgtbl, TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_R | PTE_X);
 
   // map kernel stacks
@@ -68,7 +69,7 @@ kvminithart()
 // Return the address of the PTE in page table pagetable
 // that corresponds to virtual address va.  If alloc!=0,
 // create any required page-table pages.
-//
+// return 0 ==> not alloc OR cannot allocate 
 // The risc-v Sv39 scheme has three levels of page-table
 // pages. A page-table page contains 512 64-bit PTEs.
 // A 64-bit virtual address is split into five fields:
@@ -83,14 +84,14 @@ walk(pagetable_t pagetable, uint64 va, int alloc)
   if(va >= MAXVA)
     panic("walk");
 
-  for(int level = 2; level > 0; level--) {
-    pte_t *pte = &pagetable[PX(level, va)];
-    if(*pte & PTE_V) {
-      pagetable = (pagetable_t)PTE2PA(*pte);
+  for(int level = 2; level > 0; level--) { // 逐级递减
+    pte_t *pte = &pagetable[PX(level, va)]; // 得到PTE的地址 pte_t *pte
+    if(*pte & PTE_V) { // whether Valid
+      pagetable = (pagetable_t)PTE2PA(*pte); // PTE的内容,即*pte
     } else {
       if(!alloc || (pagetable = (pde_t*)kalloc()) == 0)
         return 0;
-      memset(pagetable, 0, PGSIZE);
+      memset(pagetable, 0, PGSIZE); // if InValid set the pagetable allzero
       *pte = PA2PTE(pagetable) | PTE_V;
     }
   }
@@ -121,7 +122,7 @@ walkaddr(pagetable_t pagetable, uint64 va)
 }
 
 // add a mapping to the kernel page table.
-// only used when booting.
+// ONLY USED when booting.
 // does not flush TLB or enable paging.
 void
 kvmmap(pagetable_t kpgtbl, uint64 va, uint64 pa, uint64 sz, int perm)
@@ -134,6 +135,7 @@ kvmmap(pagetable_t kpgtbl, uint64 va, uint64 pa, uint64 sz, int perm)
 // physical addresses starting at pa. va and size might not
 // be page-aligned. Returns 0 on success, -1 if walk() couldn't
 // allocate a needed page-table page.
+// 通过parse va在pagetable中找到PTE索引, 这个PTE是pa处内存映射而来
 int
 mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
 {
@@ -143,9 +145,12 @@ mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
   if(size == 0)
     panic("mappages: size");
   
-  a = PGROUNDDOWN(va);
+  // va所属页地址空间的最低地址
+  a = PGROUNDDOWN(va); 
+  // va可能的页地址空间的最高地址
   last = PGROUNDDOWN(va + size - 1);
   for(;;){
+    // get PTE: parsing rouddown(a) as VA and matching PTE in pagetable
     if((pte = walk(pagetable, a, 1)) == 0)
       return -1;
     if(*pte & PTE_V)
@@ -432,3 +437,58 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+
+#define REPEAT_SPLIER(lvl) \
+  for (int t_tmp = 0; t_tmp < (5 - (lvl)); t_tmp++)\
+    printf("%s ", splier);\
+  
+/**
+ * first line: displays argument 
+ * recursively print valid pte 
+*/
+static
+void
+vmprint_helper(pagetable_t pagetable, int level) 
+{
+  if (level < 1) return;
+  for(int i = 0; i < 512; i++) {
+    pte_t pte = pagetable[i];
+    if (pte & PTE_V ) {
+      // printf("%0*s ", (5 - level), splier)  ; xv6's printf doesn't support this format
+      REPEAT_SPLIER(level);
+      uint64 child_pa = PTE2PA(pte);
+      printf("%d: pte %p pa %p\n", i, pte, child_pa);
+      vmprint_helper((pagetable_t) child_pa, level - 1);
+    }  
+    }
+  return ;
+}
+
+void
+vmprint(pagetable_t pagetable)
+{
+  printf("page table %x\n", pagetable);
+  vmprint_helper(pagetable, 4);
+}
+
+
+// // LEARN Recursively free page-table pages.
+// // All leaf mappings must already have been removed.
+// void
+// learn(pagetable_t pagetable)
+// {
+//   // there are 2^9 = 512 PTEs in a page table.
+//   for(int i = 0; i < 512; i++){
+//     pte_t pte = pagetable[i];
+//     if((pte & PTE_V) && (pte & (PTE_R|PTE_W|PTE_X)) == 0){
+//       // this PTE points to a lower-level page table.
+//       uint64 child = PTE2PA(pte);
+//       freewalk((pagetable_t)child);
+//       pagetable[i] = 0;
+//     } else if(pte & PTE_V){
+//       panic("freewalk: leaf");
+//     }
+//   }
+//   kfree((void*)pagetable);
+// }
+

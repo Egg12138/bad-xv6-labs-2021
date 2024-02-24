@@ -6,6 +6,10 @@
 #include "proc.h"
 #include "defs.h"
 
+#ifndef LAB_PGTBL
+#define LAB_PGTBL
+#endif
+
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -114,6 +118,7 @@ allocproc(void)
       release(&p->lock);
     }
   }
+
   return 0;
 
 found:
@@ -127,6 +132,13 @@ found:
     return 0;
   }
 
+  // Allocate a usyscall page
+  if((p->shared_syscalls = (struct usyscall *)kalloc()) == 0){
+    freeproc(p);
+    release(&p->lock);
+    return 0;
+  }
+
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -134,6 +146,7 @@ found:
     release(&p->lock);
     return 0;
   }
+  
 
   // Set up new context to start executing at forkret,
   // which returns to user space.
@@ -164,6 +177,8 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  kfree((void *)p->shared_syscalls);
+  p->shared_syscalls = 0;
 }
 
 // Create a user page table for a given process,
@@ -177,7 +192,6 @@ proc_pagetable(struct proc *p)
   pagetable = uvmcreate();
   if(pagetable == 0)
     return 0;
-
   // map the trampoline code (for system call return)
   // at the highest user virtual address.
   // only the supervisor uses it, on the way
@@ -190,11 +204,21 @@ proc_pagetable(struct proc *p)
 
   // map the trapframe just below TRAMPOLINE, for trampoline.S.
   if(mappages(pagetable, TRAPFRAME, PGSIZE,
-              (uint64)(p->trapframe), PTE_R | PTE_W) < 0){
+              (uint64)(p->trapframe) 
+              , PTE_R | PTE_W) < 0){
     uvmunmap(pagetable, TRAMPOLINE, 1, 0);
     uvmfree(pagetable, 0);
     return 0;
   }
+
+  // FIXME speed up
+  if(mappages(pagetable, USYSCALL, PGSIZE, 
+                (uint64)(p->shared_syscalls), PTE_R | PTE_U) < 0) {
+    uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmunmap(pagetable, TRAPFRAME, 1, 0);
+    uvmfree(pagetable, 0);
+    return 0;
+    }
 
   return pagetable;
 }
@@ -206,6 +230,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  uvmunmap(pagetable, USYSCALL, 1, 0);
   uvmfree(pagetable, sz);
 }
 
