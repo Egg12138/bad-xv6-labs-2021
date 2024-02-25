@@ -132,3 +132,19 @@ printfinit(void)
   initlock(&pr.lock, "pr");
   pr.locking = 1;
 }
+
+
+// IMPL after being called by `sys_sleep`, read proc's `s0` to get 
+// the current stack frame address (s0 -> sp + 8)
+void
+backtrace(void)
+{
+  #define SP_OFFSET_STEP 8
+  printf("backtrace:\n");
+  uint64 fp = r_fp();
+  while ((PGROUNDUP(fp) - PGROUNDDOWN(fp)) == PGSIZE ) {
+    uint64 ret_addr = *(uint64 *)(fp - SP_OFFSET_STEP);
+    printf("%p\n", ret_addr);
+    fp = *(uint64 *)(fp - 2 * SP_OFFSET_STEP);
+  }
+}

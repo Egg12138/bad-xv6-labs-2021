@@ -52,6 +52,7 @@ sys_sbrk(void)
   return addr;
 }
 
+// TODO: call kernel::printf::backtrace properly
 uint64
 sys_sleep(void)
 {
@@ -70,6 +71,8 @@ sys_sleep(void)
     sleep(&ticks, &tickslock);
   }
   release(&tickslock);
+
+  backtrace();
   return 0;
 }
 
@@ -94,4 +97,25 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+
+/// @brief arg0: ticks interval, arg1: handler function address. 
+/// @details EVERY n ticks, cause FN, 
+uint64
+sys_sigalarm(void)
+{
+  int interval;
+  uint64 handler_addr;
+  if ((argint(0, &interval) < 0)
+      || (argaddr(1, &handler_addr) < 0)) {
+      return -1;
+  } 
+
+  struct proc *p = myproc();
+    p->alarm_interval = interval;
+    p->alarm_handler = handler_addr;
+  
+    
+  return 0;
 }
